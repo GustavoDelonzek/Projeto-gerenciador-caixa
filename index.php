@@ -74,7 +74,35 @@ function exibirLogs()
     readline("Qualquer tecla para continuar...");
 }
 
-function limparLogs(){
+function cadastrarProduto()
+{
+    global $produtos;
+    limparTela();
+    $id = count($produtos) + 1;
+    echo "---CADASTRO DE PRODUTO---\nId: $id\n";
+
+    $nome = readline("Nome: ");
+    $preco = readline("Preço: ");
+    $estoque = readline("Estoque: ");
+
+    $produtos[] = [
+        "id" => $id,
+        "nome" => $nome,
+        "preco" => $preco,
+        "estoque" => $estoque
+    ];
+    limparTela();
+    registrarLog("Novo produto '$nome' cadastrado com sucesso");
+
+    echo "Produto cadastrado com sucesso!\n";
+
+}
+
+
+
+
+function limparLogs()
+{
     file_put_contents("logs.txt", "");
 }
 
@@ -109,6 +137,8 @@ while (true) {
                         limparTela();
                     } else if ($escolha == 3) {
                         cadastrarUsuario();
+                    } else if ($escolha == 4) {
+                        cadastrarProduto();
                     } else if ($escolha == 6) {
                         registrarLog("Usuário $usuario deslogou");
 
