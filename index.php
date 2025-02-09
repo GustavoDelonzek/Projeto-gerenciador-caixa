@@ -40,6 +40,8 @@ function cadastrarUsuario()
     foreach ($usuarios as $user) {
         if ($user["usuario"] === $novoUsuario) {
             limparTela();
+            registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
+
             echo "Usuário já existe!\n";
             return;
         }
@@ -51,11 +53,30 @@ function cadastrarUsuario()
         "senha" => $senha
     ];
     limparTela();
-    echo "Usuário cadastrado com sucesso!\n";
+    registrarLog("Novo usuário $novoUsuario cadastrado com sucesso");
 
+    echo "Usuário cadastrado com sucesso!\n";
 
 }
 
+function registrarLog($texto)
+{
+    $data = date('d/m/Y H:i:s');
+    $log = "$texto - $data\n";
+    file_put_contents("logs.txt", $log, FILE_APPEND);
+}
+
+function exibirLogs()
+{
+    $logs = file_get_contents("logs.txt");
+    limparTela();
+    echo $logs;
+    readline("Qualquer tecla para continuar...");
+}
+
+function limparLogs(){
+    file_put_contents("logs.txt", "");
+}
 
 function limparTela()
 {
@@ -75,19 +96,26 @@ while (true) {
         $senha = readline("Senha: ");
 
         if (logar($usuario, $senha)) {
+            registrarLog("Usuário $usuario fez login");
             limparTela();
             while (true) {
                 //Menu do usuario logado'
                 if (isset($caixa)) {
-                    
+
                     echo "[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n";
                     $escolha = readline("-");
-
-                    if ($escolha == 3) {
+                    if ($escolha == 2) {
+                        exibirLogs();
+                        limparTela();
+                    } else if ($escolha == 3) {
                         cadastrarUsuario();
                     } else if ($escolha == 6) {
+                        registrarLog("Usuário $usuario deslogou");
+
                         limparTela();
                         break;
+                    } else {
+                        limparTela();
                     }
 
 
@@ -100,9 +128,12 @@ while (true) {
             }
         } else {
             limparTela();
+            registrarLog("Tentativa de login falhou para $usuario");
+
             echo "Senha ou Usuário incorretos!\n";
         }
     } else if ($escolha == 2) {
+        limparLogs();
         break;
     }
 
