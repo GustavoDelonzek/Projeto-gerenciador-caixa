@@ -3,7 +3,8 @@
 $usuarios = [
     [
         "usuario" => "admin",
-        "senha" => "12345"
+        "senha" => "12345",
+        "vendas" => 0
     ]
 ];
 
@@ -31,26 +32,36 @@ function logar($usuario, $senha)
     return false;
 }
 
+function existeUsuario($nome)
+{
+    global $usuarios;
+    foreach ($usuarios as $user) {
+        if ($user["usuario"] === $nome) {
+            return true;
+        }
+    }
+    return false;
+}
+
 
 function cadastrarUsuario()
 {
     limparTela();
     global $usuarios;
     $novoUsuario = readline("Novo usuário: ");
-    foreach ($usuarios as $user) {
-        if ($user["usuario"] === $novoUsuario) {
-            limparTela();
-            registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
+    if (existeUsuario($novoUsuario)) {
+        limparTela();
+        registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
 
-            echo "Usuário já existe!\n";
-            return;
-        }
+        echo "Usuário já existe!\n";
+        return;
     }
     $senha = readline("Senha: ");
 
     $usuarios[] = [
         "usuario" => $novoUsuario,
-        "senha" => $senha
+        "senha" => $senha,
+        "vendas" => 0
     ];
     limparTela();
     registrarLog("Novo usuário $novoUsuario cadastrado com sucesso");
@@ -64,6 +75,17 @@ function registrarLog($texto)
     $data = date('d/m/Y H:i:s');
     $log = "$texto - $data\n";
     file_put_contents("logs.txt", $log, FILE_APPEND);
+}
+
+function atualizarVendaUsuario($usuario, $valor)
+{
+    global $usuarios;
+    foreach ($usuarios as $user) {
+        if ($user["usuario"] == $usuario) {
+            $user["vendas"] += $valor;
+            registrarLog("Vendas do usuário '$usuario' atualizada!");
+        }
+    }
 }
 
 function exibirLogs()
@@ -122,7 +144,7 @@ function editarProduto()
             } else {
                 return;
             }
-            
+
             $produto[$escolha] = $mudanca;
             limparTela();
 
@@ -137,6 +159,97 @@ function editarProduto()
     registrarLog("Produto com  id: $idEditar não encontrado!");
     echo "Produto não encontrado!\n";
 
+}
+
+function existeProduto($id)
+{
+    global $produtos;
+    foreach ($produtos as $produto) {
+        if ($produto["id"] == $id) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function verificaEstoque($id, $quantidade)
+{
+    global $produtos;
+    foreach ($produtos as $produto) {
+        if ($produto["id"] == $id && $produto["estoque"] >= $quantidade) {
+            return true;
+        }
+    }
+    return false;
+
+}
+
+function precificarVenda($id, $quantidade)
+{
+    global $produtos;
+    foreach ($produtos as $produto) {
+        if ($produto["id"] == $id) {
+            return $produto["preco"] * $quantidade;
+        }
+    }
+}
+
+function atualizarEstoque($quantidade, $id)
+{
+    global $produtos;
+    foreach ($produtos as &$produto) {
+        if ($produto["id"] == $id) {
+            $produto["estoque"] -= $quantidade;
+            registrarLog("Produto com id $id teve seu estoque atualizado, estoque atual " . $produto["estoque"]);
+        }
+    }
+}
+
+
+function realizarVenda($user)
+{
+    global $caixa;
+    global $produtos;
+    limparTela();
+    $idProduto = readline("Qual id do produto para a venda: ");
+    if (existeProduto($idProduto)) {
+        $quantidade = readline("Quantas unidades do produto? ");
+        if (verificaEstoque($idProduto, $quantidade)) {
+            limparTela();
+            $valorVenda = precificarVenda($idProduto, $quantidade);
+            echo "--------------------------\nO valor da venda ficou R$" . number_format($valorVenda, 2) . "\n";
+            $recebido = readline("Valor recebido pelo cliente: R$");
+
+            $troco = $recebido - $valorVenda;
+            if($recebido < $valorVenda){
+                limparTela();
+                registrarLog("Venda cancelada: Cliente com valor insuficiente!");
+                echo "Valor de pagamento suficiente! Venda cancelada!\n";
+            } else{
+
+                if ($troco <= $caixa) {
+                    //Adiciona vendas ao usuario, atualiza o estoque, registar log de venda, atualizar valor do caixa
+                    atualizarVendaUsuario($user,$valorVenda);
+                    atualizarEstoque($quantidade, $idProduto);
+                    $caixa += ($recebido - $troco);
+                    registrarLog("Usuário '$user' realizou venda de $quantidade unidades do produto $idProduto no valor de R$$valorVenda");
+                } else {
+                    limparTela();
+                    registrarLog("Venda cancelada: Sem troco em caixa !");
+                    echo "Caixa sem troco suficiente! Venda cancelada!\n";
+                }
+            }
+        } else {
+            limparTela();
+            registrarLog("Venda cancelada: estoque insuficiente do produto com id: $idProduto !");
+            echo "Produto com estoque insuficiente!\n";
+        }
+    } else {
+        limparTela();
+        registrarLog("Venda cancelada: produto com id $idProduto não encontrado!");
+        echo "Produto não encontrado!\n";
+    }
 }
 
 
@@ -171,7 +284,9 @@ while (true) {
 
                     echo "--------------------------\nDinheiro em caixa: $caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n--------------------------\n";
                     $escolha = readline("-");
-                    if ($escolha == 2) {
+                    if ($escolha == 1) {
+                        realizarVenda($usuario);
+                    } else if ($escolha == 2) {
                         exibirLogs();
                         limparTela();
                     } else if ($escolha == 3) {
