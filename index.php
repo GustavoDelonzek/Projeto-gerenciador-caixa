@@ -80,7 +80,7 @@ function registrarLog($texto)
 function atualizarVendaUsuario($usuario, $valor)
 {
     global $usuarios;
-    foreach ($usuarios as $user) {
+    foreach ($usuarios as &$user) {
         if ($user["usuario"] == $usuario) {
             $user["vendas"] += $valor;
             registrarLog("Vendas do usuário '$usuario' atualizada!");
@@ -128,7 +128,7 @@ function editarProduto()
     echo "---EDIÇÃO DE PRODUTO---\n";
     $idEditar = readline("Qual id do produto: ");
 
-    foreach ($produtos as $produto) {
+    foreach ($produtos as &$produto) {
         if ($produto["id"] == $idEditar) {
             echo "O que deseja editar?\n[1]Nome\n[2]Preço\n[3]Estoque\n";
             $escolha = readline("- ");
