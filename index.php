@@ -31,6 +31,32 @@ function logar($usuario, $senha)
     return false;
 }
 
+
+function cadastrarUsuario()
+{
+    limparTela();
+    global $usuarios;
+    $novoUsuario = readline("Novo usuário: ");
+    foreach ($usuarios as $user) {
+        if ($user["usuario"] === $novoUsuario) {
+            limparTela();
+            echo "Usuário já existe!\n";
+            return;
+        }
+    }
+    $senha = readline("Senha: ");
+
+    $usuarios[] = [
+        "usuario" => $novoUsuario,
+        "senha" => $senha
+    ];
+    limparTela();
+    echo "Usuário cadastrado com sucesso!\n";
+
+
+}
+
+
 function limparTela()
 {
     echo "\033[H\033[J";
@@ -49,22 +75,32 @@ while (true) {
         $senha = readline("Senha: ");
 
         if (logar($usuario, $senha)) {
+            limparTela();
             while (true) {
                 //Menu do usuario logado'
-                if(isset($caixa)){
-                    limparTela();
-                echo "[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Deslogar\n";
-                $escolha = readline("-");
+                if (isset($caixa)) {
                     
-                } else{
+                    echo "[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n";
+                    $escolha = readline("-");
+
+                    if ($escolha == 3) {
+                        cadastrarUsuario();
+                    } else if ($escolha == 6) {
+                        limparTela();
+                        break;
+                    }
+
+
+                } else {
                     limparTela();
                     $caixa = readline("Quanto de dinheiro há no caixa? ");
+                    limparTela();
                 }
-                
+
             }
         } else {
             limparTela();
-            echo "Senha ou usuarios incorretos!\n";
+            echo "Senha ou Usuário incorretos!\n";
         }
     } else if ($escolha == 2) {
         break;
