@@ -16,6 +16,8 @@ $produtos = [
     ]
 ];
 
+$caixa = null;
+
 
 function logar($usuario, $senha)
 {
@@ -49,10 +51,16 @@ while (true) {
         if (logar($usuario, $senha)) {
             while (true) {
                 //Menu do usuario logado'
-                limparTela();
+                if(isset($caixa)){
+                    limparTela();
                 echo "[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Deslogar\n";
                 $escolha = readline("-");
-
+                    
+                } else{
+                    limparTela();
+                    $caixa = readline("Quanto de dinheiro há no caixa? ");
+                }
+                
             }
         } else {
             limparTela();
