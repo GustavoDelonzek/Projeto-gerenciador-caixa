@@ -98,6 +98,46 @@ function cadastrarProduto()
 
 }
 
+function editarProduto()
+{
+    global $produtos;
+    echo "---EDIÇÃO DE PRODUTO---\n";
+    $idEditar = readline("Qual id do produto: ");
+   
+
+   
+    foreach ($produtos as $produto) {
+        if ($produto["id"] == $idEditar) {
+            echo "O que deseja editar?\n[1]Nome\n[2]Preço\n[3]Estoque\n";
+            $escolha = readline("- ");
+            if ($escolha == 1) {
+                $escolha = "nome";
+                $mudanca = readline("Novo nome: ");
+            } else if ($escolha == 2) {
+                $escolha = "preco";
+                $mudanca = readline("Novo preço: ");
+            } else if ($escolha == 3) {
+                $escolha = "estoque";
+                $mudanca = readline("Novo estoque: ");
+            } else {
+                return;
+            }
+            $produto[$escolha] = $mudanca;
+            limparTela();
+
+            registrarLog("Produto com  id: $idEditar teve seu $escolha editado com sucesso");
+            echo "Produto editado com sucesso!\n";
+            return;
+        }
+    }
+
+    limparTela();
+
+    registrarLog("Produto com  id: $idEditar não encontrado!");
+    echo "Produto não encontrado!\n";
+
+}
+
 
 
 
@@ -139,6 +179,8 @@ while (true) {
                         cadastrarUsuario();
                     } else if ($escolha == 4) {
                         cadastrarProduto();
+                    } else if ($escolha == 5) {
+                        editarProduto();
                     } else if ($escolha == 6) {
                         registrarLog("Usuário $usuario deslogou");
 
