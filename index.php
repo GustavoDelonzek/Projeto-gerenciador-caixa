@@ -101,11 +101,11 @@ function cadastrarProduto()
 function editarProduto()
 {
     global $produtos;
+    limparTela();
+
     echo "---EDIÇÃO DE PRODUTO---\n";
     $idEditar = readline("Qual id do produto: ");
-   
 
-   
     foreach ($produtos as $produto) {
         if ($produto["id"] == $idEditar) {
             echo "O que deseja editar?\n[1]Nome\n[2]Preço\n[3]Estoque\n";
@@ -122,6 +122,7 @@ function editarProduto()
             } else {
                 return;
             }
+            
             $produto[$escolha] = $mudanca;
             limparTela();
 
@@ -137,8 +138,6 @@ function editarProduto()
     echo "Produto não encontrado!\n";
 
 }
-
-
 
 
 function limparLogs()
@@ -170,7 +169,7 @@ while (true) {
                 //Menu do usuario logado'
                 if (isset($caixa)) {
 
-                    echo "[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n";
+                    echo "--------------------------\nDinheiro em caixa: $caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n--------------------------\n";
                     $escolha = readline("-");
                     if ($escolha == 2) {
                         exibirLogs();
