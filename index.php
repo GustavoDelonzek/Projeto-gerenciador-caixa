@@ -1,4 +1,5 @@
 <?php
+date_default_timezone_set("America/Sao_Paulo");
 
 $usuarios = [
     [
@@ -291,7 +292,7 @@ function limparTela()
 limparTela();
 
 while (true) {
-    echo "[1] Login\n[2] Sair\n";
+    echo "--------------------------\n[1] Login\n[2] Sair\n--------------------------\n";
     $escolha = readline("-");
 
     if ($escolha == 1) {
