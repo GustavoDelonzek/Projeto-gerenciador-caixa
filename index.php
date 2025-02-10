@@ -185,6 +185,19 @@ function verificaEstoque($id, $quantidade)
 
 }
 
+function exibirProdutos(){
+    limparTela();
+    global $produtos;
+    echo "----ESTOQUE DE PRODUTOS----\nProdutos cadastrados: " . count($produtos) . "\n---------------------------\n";
+    foreach($produtos as $produto){
+        echo "Id: " . $produto["id"] . "\nNome: " . $produto["nome"] . "\nPreço: R$" . $produto["preco"] . "\nEstoque: " . $produto["estoque"] . "\n---------------------------\n";
+    }
+
+    readline("Pressione qualquer tecla para voltar...");
+    limparTela();
+
+}
+
 function precificarVenda($id, $quantidade)
 {
     global $produtos;
@@ -274,7 +287,7 @@ while (true) {
         limparTela();
         $usuario = readline("Usuário: ");
         $senha = readline("Senha: ");
-
+        $usuario = trim($usuario);
         if (logar($usuario, $senha)) {
             registrarLog("Usuário $usuario fez login");
             limparTela();
@@ -282,7 +295,7 @@ while (true) {
                 //Menu do usuario logado'
                 if (isset($caixa)) {
 
-                    echo "--------------------------\nDinheiro em caixa: $caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Deslogar\n--------------------------\n";
+                    echo "--------------------------\nDinheiro em caixa: $caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Exibir produtos\n[7]Deslogar\n--------------------------\n";
                     $escolha = readline("-");
                     if ($escolha == 1) {
                         realizarVenda($usuario);
@@ -295,7 +308,11 @@ while (true) {
                         cadastrarProduto();
                     } else if ($escolha == 5) {
                         editarProduto();
-                    } else if ($escolha == 6) {
+                    }  else if($escolha == 6){
+                        exibirProdutos();
+                        registrarLog("O $usuario visualizou os produtos cadastrados");
+                    } 
+                    else if ($escolha == 7) {
                         registrarLog("Usuário $usuario deslogou");
 
                         limparTela();
