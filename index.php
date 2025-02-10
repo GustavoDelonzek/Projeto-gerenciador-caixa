@@ -43,6 +43,16 @@ function existeUsuario($nome)
     return false;
 }
 
+function exibirVendasUsuario($nome){
+    global $usuarios;
+    foreach ($usuarios as $usuario){
+        if($nome == $usuario["usuario"]){
+            return $usuario["vendas"];
+        }
+    }
+
+    return 0;
+}
 
 function cadastrarUsuario()
 {
@@ -69,6 +79,7 @@ function cadastrarUsuario()
     echo "Usuário cadastrado com sucesso!\n";
 
 }
+
 
 function registrarLog($texto)
 {
@@ -295,7 +306,7 @@ while (true) {
                 //Menu do usuario logado'
                 if (isset($caixa)) {
 
-                    echo "--------------------------\nDinheiro em caixa: $caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Exibir produtos\n[7]Deslogar\n--------------------------\n";
+                    echo "--------------------------\nDinheiro em caixa: R$$caixa\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Exibir produtos\n[7]Exibir usuário\n[8]Deslogar\n--------------------------\n";
                     $escolha = readline("-");
                     if ($escolha == 1) {
                         realizarVenda($usuario);
@@ -311,8 +322,14 @@ while (true) {
                     }  else if($escolha == 6){
                         exibirProdutos();
                         registrarLog("O $usuario visualizou os produtos cadastrados");
-                    } 
-                    else if ($escolha == 7) {
+                    } else if($escolha == 7){
+                        limparTela();
+                        echo "--------------------------\nUsuário Atual: $usuario\nTotal de vendas realizadas: R$" . number_format(exibirVendasUsuario($usuario),2) . "\n--------------------------\n";
+                        readline("Pressione qualquer tecla para voltar...");
+                        registrarLog("O $usuario visualizou seu próprio perfil");
+                        limparTela();
+                    }
+                    else if ($escolha == 8) {
                         registrarLog("Usuário $usuario deslogou");
 
                         limparTela();
