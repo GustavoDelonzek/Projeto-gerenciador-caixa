@@ -44,10 +44,11 @@ function existeUsuario($nome)
     return false;
 }
 
-function exibirVendasUsuario($nome){
+function exibirVendasUsuario($nome)
+{
     global $usuarios;
-    foreach ($usuarios as $usuario){
-        if($nome == $usuario["usuario"]){
+    foreach ($usuarios as $usuario) {
+        if ($nome == $usuario["usuario"]) {
             return $usuario["vendas"];
         }
     }
@@ -116,8 +117,30 @@ function cadastrarProduto()
     echo "---CADASTRO DE PRODUTO---\nId: $id\n";
 
     $nome = readline("Nome: ");
-    $preco = readline("Preço: ");
-    $estoque = readline("Estoque: ");
+
+    $preco = (double) readline("Preço: ");
+    while (true) {
+        if ($preco <= 0 || !is_double($preco)) {
+            limparTela();
+            echo "Valor inserido incorreto!\n";
+            $preco = (double) readline("Preço: ");
+
+        } else {
+            break;
+        }
+    }
+
+    $estoque = (int) readline("Estoque: ");
+    while (true) {
+        if ($estoque <= 0 || !is_int($estoque)) {
+            limparTela();
+            echo "Valor inserido incorreto!\n";
+            $estoque = (int) readline("Estoque: ");
+
+        } else {
+            break;
+        }
+    }
 
     $produtos[] = [
         "id" => $id,
@@ -149,10 +172,30 @@ function editarProduto()
                 $mudanca = readline("Novo nome: ");
             } else if ($escolha == 2) {
                 $escolha = "preco";
-                $mudanca = readline("Novo preço: ");
+                $mudanca = (double) readline("Novo preço: ");
+                while (true) {
+                    if ($mudanca <= 0 || !is_double($mudanca)) {
+                        limparTela();
+                        echo "Valor inserido incorreto!\n";
+                        $mudanca = (double) readline("Novo preço: ");
+            
+                    } else {
+                        break;
+                    }
+                }
             } else if ($escolha == 3) {
                 $escolha = "estoque";
-                $mudanca = readline("Novo estoque: ");
+                $mudanca = (int) readline("Novo estoque: ");
+                while (true) {
+                    if ($mudanca <= 0 || !is_int($mudanca)) {
+                        limparTela();
+                        echo "Valor inserido incorreto!\n";
+                        $mudanca = (int) readline("Novo estoque: ");
+            
+                    } else {
+                        break;
+                    }
+                }
             } else {
                 return;
             }
@@ -197,11 +240,12 @@ function verificaEstoque($id, $quantidade)
 
 }
 
-function exibirProdutos(){
+function exibirProdutos()
+{
     limparTela();
     global $produtos;
     echo "----ESTOQUE DE PRODUTOS----\nProdutos cadastrados: " . count($produtos) . "\n---------------------------\n";
-    foreach($produtos as $produto){
+    foreach ($produtos as $produto) {
         echo "Id: " . $produto["id"] . "\nNome: " . $produto["nome"] . "\nPreço: R$" . $produto["preco"] . "\nEstoque: " . $produto["estoque"] . "\n---------------------------\n";
     }
 
@@ -239,7 +283,18 @@ function realizarVenda($user)
     limparTela();
     $idProduto = readline("Qual id do produto para a venda: ");
     if (existeProduto($idProduto)) {
-        $quantidade = readline("Quantas unidades do produto? ");
+        $quantidade = (int) readline("Quantas unidades do produto? ");
+        
+        while (true) {
+            if ($quantidade <= 0 || !is_int($quantidade)) {
+                limparTela();
+                echo "Valor inserido incorreto!\n";
+                $quantidade = (int) readline("Quantas unidades do produto? ");
+
+            } else {
+                break;
+            }
+        }
         if (verificaEstoque($idProduto, $quantidade)) {
             limparTela();
             $valorVenda = precificarVenda($idProduto, $quantidade);
@@ -247,15 +302,15 @@ function realizarVenda($user)
             $recebido = readline("Valor recebido pelo cliente: R$");
 
             $troco = $recebido - $valorVenda;
-            if($recebido < $valorVenda){
+            if ($recebido < $valorVenda) {
                 limparTela();
                 registrarLog("Venda cancelada: Cliente com valor insuficiente!");
                 echo "Valor de pagamento suficiente! Venda cancelada!\n";
-            } else{
+            } else {
 
                 if ($troco <= $caixa) {
                     //Adiciona vendas ao usuario, atualiza o estoque, registar log de venda, atualizar valor do caixa
-                    atualizarVendaUsuario($user,$valorVenda);
+                    atualizarVendaUsuario($user, $valorVenda);
                     atualizarEstoque($quantidade, $idProduto);
                     $caixa += ($recebido - $troco);
                     registrarLog("Usuário '$user' realizou venda de $quantidade unidades do produto $idProduto no valor de R$$valorVenda");
@@ -320,17 +375,16 @@ while (true) {
                         cadastrarProduto();
                     } else if ($escolha == 5) {
                         editarProduto();
-                    }  else if($escolha == 6){
+                    } else if ($escolha == 6) {
                         exibirProdutos();
                         registrarLog("O $usuario visualizou os produtos cadastrados");
-                    } else if($escolha == 7){
+                    } else if ($escolha == 7) {
                         limparTela();
-                        echo "--------------------------\nUsuário Atual: $usuario\nTotal de vendas realizadas: R$" . number_format(exibirVendasUsuario($usuario),2) . "\n--------------------------\n";
+                        echo "--------------------------\nUsuário Atual: $usuario\nTotal de vendas realizadas: R$" . number_format(exibirVendasUsuario($usuario), 2) . "\n--------------------------\n";
                         readline("Pressione qualquer tecla para voltar...");
                         registrarLog("O $usuario visualizou seu próprio perfil");
                         limparTela();
-                    }
-                    else if ($escolha == 8) {
+                    } else if ($escolha == 8) {
                         registrarLog("Usuário $usuario deslogou");
 
                         limparTela();
