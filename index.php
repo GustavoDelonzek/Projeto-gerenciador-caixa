@@ -396,7 +396,17 @@ while (true) {
 
                 } else {
                     limparTela();
-                    $caixa = readline("Quanto de dinheiro há no caixa? ");
+                    $caixa = (double) readline("Quanto de dinheiro há no caixa? R$");
+                    while (true) {
+                        if ($caixa <= 0 || !is_double($caixa)) {
+                            limparTela();
+                            echo "Valor inserido incorreto!\n";
+                            $caixa = (double) readline("Digite um valor válido para o caixa: R$");
+                
+                        } else {
+                            break;
+                        }
+                    }
                     limparTela();
                 }
 
