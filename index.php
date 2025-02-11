@@ -330,14 +330,15 @@ function realizarVenda($user)
                 break;
             }
         }
-        if (verificaEstoque($idProduto, $quantidade)) {
+        if (verificaEstoque($idProduto, $quantidade)) { //feito com a classe
             limparTela();
-            $valorVenda = precificarVenda($idProduto, $quantidade);
+            $valorVenda = precificarVenda($idProduto, $quantidade); //feito com o get preco * quantidade da classe produto
             echo "--------------------------\nO valor da venda ficou R$" . number_format($valorVenda, 2) . "\n";
             $recebido = readline("Valor recebido pelo cliente: R$");
 
-            $troco = $recebido - $valorVenda;
-            if ($recebido < $valorVenda) {
+            $troco = $recebido - $valorVenda; //verifica esse troco com a classe caixa
+
+            if ($recebido < $valorVenda) { 
                 limparTela();
                 registrarLog("Venda cancelada: Cliente com valor insuficiente!");
                 echo "Valor de pagamento suficiente! Venda cancelada!\n";
@@ -350,7 +351,7 @@ function realizarVenda($user)
                     $caixa += ($recebido - $troco);
                     registrarLog("Usuário '$user' realizou venda de $quantidade unidades do produto $idProduto no valor de R$$valorVenda");
                     limparTela();
-                    echo "Venda realizada com sucesso! +R$$valorVenda";
+                    echo "Venda realizada com sucesso! +R$$valorVenda\n";
                 } else {
                     limparTela();
                     registrarLog("Venda cancelada: Sem troco em caixa !");
