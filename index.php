@@ -61,15 +61,34 @@ function cadastrarUsuario()
     limparTela();
     global $usuarios;
     $novoUsuario = readline("Novo usuário: ");
-    if (existeUsuario($novoUsuario)) {
-        limparTela();
-        registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
-
-        echo "Usuário já existe!\n";
-        return;
+    while(true){
+        if(strlen(trim($novoUsuario)) < 3){
+            limparTela();
+               
+            echo "Nome de usuário deve conter pelo menos 3 caracteres!Tente Novamente.\n";
+            $novoUsuario = readline("Novo usuário: ");
+        }elseif (existeUsuario($novoUsuario)) {
+            limparTela();
+            registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
+            
+            echo "Usuário já existe! TENTE NOVAMENTE.\n";
+            $novoUsuario = readline("Novo usuário: ");
+        } else{
+            break;
+        }
     }
     $senha = readline("Senha: ");
-
+    while(true){
+        if(strlen(trim($senha)) < 5){
+            limparTela();
+               
+            echo "Senha deve conter pelo menos 5 caracteres! TENTE NOVAMENTE.\n";
+            $senha = readline("Senha: ");
+        } else{
+            break;
+        }
+    }
+ 
     $usuarios[] = [
         "usuario" => $novoUsuario,
         "senha" => $senha,
@@ -117,15 +136,30 @@ function cadastrarProduto()
     echo "---CADASTRO DE PRODUTO---\nId: $id\n";
 
     $nome = readline("Nome: ");
+    while(true){
+        if(strlen(trim($nome)) < 1){
+            limparTela();
+            echo "---CADASTRO DE PRODUTO---\nNome deve conter pelo menos 1 caracter válido!\n--------------------------\nId: $id\n";
 
+            $nome = readline("Nome: ");
+        } else{
+            limparTela();
+            echo "---CADASTRO DE PRODUTO---\nId: $id\nNome: $nome\n";
+
+            break;
+        }
+    }
     $preco = (double) readline("Preço: ");
     while (true) {
         if ($preco <= 0 || !is_double($preco)) {
             limparTela();
-            echo "Valor inserido incorreto!\n";
+            echo "---CADASTRO DE PRODUTO---\nValor inserido inválido para preço!\n--------------------------\nId: $id\nNome: $nome\n";
+           
             $preco = (double) readline("Preço: ");
 
         } else {
+            limparTela();
+            echo "---CADASTRO DE PRODUTO---\nId: $id\nNome: $nome\nPreço: R$$preco\n";
             break;
         }
     }
@@ -134,7 +168,8 @@ function cadastrarProduto()
     while (true) {
         if ($estoque <= 0 || !is_int($estoque)) {
             limparTela();
-            echo "Valor inserido incorreto!\n";
+            echo "---CADASTRO DE PRODUTO---\nValor inserido inválido para o campo estoque!\n--------------------------\nId: $id\nNome: $nome\nPreço: R$$preco\n";
+
             $estoque = (int) readline("Estoque: ");
 
         } else {
@@ -314,6 +349,8 @@ function realizarVenda($user)
                     atualizarEstoque($quantidade, $idProduto);
                     $caixa += ($recebido - $troco);
                     registrarLog("Usuário '$user' realizou venda de $quantidade unidades do produto $idProduto no valor de R$$valorVenda");
+                    limparTela();
+                    echo "Venda realizada com sucesso! +R$$valorVenda";
                 } else {
                     limparTela();
                     registrarLog("Venda cancelada: Sem troco em caixa !");
