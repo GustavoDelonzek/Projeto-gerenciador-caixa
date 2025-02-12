@@ -5,7 +5,7 @@ class User
 {
     public $id;
     public $usuario;
-    public $senha;
+    private $senha;
     public $vendas;
 
 
@@ -29,6 +29,14 @@ class User
 
 
         registrarLog("O $this->usuario visualizou seu próprio perfil");
+    }
+
+    public function getSenha(){
+        return $this->senha;
+    }
+
+    public function getUsuario(){
+        return $this->usuario;
     }
 
 }
@@ -114,7 +122,6 @@ class Caixa
         $this->dinheiro = $dinheiro;
     }
 
-
     public function verificarTroco($troco)
     {
         if ($troco > $this->dinheiro) {
@@ -123,7 +130,6 @@ class Caixa
             return true;
         }
     }
-
 
     public function realizarVenda($valorVenda, )
     {
@@ -138,26 +144,23 @@ class Caixa
 }
 
 
-
-
 function logar($usuario, $senha)
 {
     global $usuarios;
     global $usuarioAtual;
     foreach ($usuarios as $user) {
-        if ($user->usuario == $usuario && $user->senha == $senha) {
+        if ($user->getUsuario() == $usuario && $user->getSenha() == $senha) {
             $usuarioAtual = $user;
             return true;
         }
     }
-
     return false;
 }
 
 function deslogar()
 {
     global $usuarioAtual;
-    registrarLog("Usuário $usuarioAtual->usuario deslogou");
+    registrarLog("Usuário " . $usuarioAtual->getUsuario() . " deslogou");
     $usuarioAtual = null;
 
 }
@@ -166,7 +169,7 @@ function existeUsuario($nome)
 {
     global $usuarios;
     foreach ($usuarios as $user) {
-        if ($user->usuario == $nome) {
+        if ($user->getUsuario() == $nome) {
             return true;
         }
     }
@@ -199,11 +202,6 @@ function exibirProdutos()
     limparTela();
 
 }
-
-
-
-
-
 
 function registrarLog($texto)
 {
@@ -240,9 +238,6 @@ $usuarios[] = new User(1, 'admin', 12345);
 $usuarioAtual = null;
 
 
-
-
-
 limparTela();
 
 while (true) {
@@ -260,7 +255,6 @@ while (true) {
             while (true) {
                 //Menu do usuario logado'
                 if (isset($caixa)) {
-
                     echo "--------------------------\nDinheiro em caixa: R$" . $caixa->getDinheiro() . "\n--------------------------\n[1]Realizar venda\n[2]Verificar logs\n[3]Cadastrar novo usuário\n[4]Cadastrar novo produto\n[5]Editar produto\n[6]Exibir produtos\n[7]Exibir usuário\n[8]Deslogar\n--------------------------\n";
                     $escolha = readline("-");
                     if ($escolha == 1) {
@@ -298,7 +292,7 @@ while (true) {
                                         $usuarioAtual->adicionaVenda($valorVenda);
                                         $produto->removerEstoque($quantidade);
                                         $caixa->realizarVenda($recebido - $troco);
-                                        registrarLog("Usuário '$user' realizou venda de $quantidade unidades do produto $idProduto no valor de R$$valorVenda");
+                                        registrarLog("Usuário '$usuarioAtual->usuario' realizou venda de $quantidade unidades do produto ". $produto->getNome() . " no valor de R$$valorVenda");
                                         limparTela();
                                         echo "Venda realizada com sucesso!" . $troco > 0 ? "Troco: R$" . number_format($troco, 2) . "\n" : "";
                                         echo "Venda: +R$$valorVenda\n";
@@ -332,8 +326,8 @@ while (true) {
                                 $novoUsuario = readline("Novo usuário: ");
                             } elseif (existeUsuario($novoUsuario)) {
                                 limparTela();
-                                registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
 
+                                registrarLog("Falha no cadastro! usuário $novoUsuario já existe ");
                                 echo "Usuário já existe! TENTE NOVAMENTE.\n";
                                 $novoUsuario = readline("Novo usuário: ");
                             } else {
@@ -344,7 +338,6 @@ while (true) {
                         while (true) {
                             if (strlen(trim($senha)) < 5) {
                                 limparTela();
-
                                 echo "Senha deve conter pelo menos 5 caracteres! TENTE NOVAMENTE.\n";
                                 $senha = readline("Senha: ");
                             } else {
@@ -355,10 +348,10 @@ while (true) {
                         $usuarios[] = new User(count($usuarios) + 1, $novoUsuario, $senha);
                         limparTela();
                         registrarLog("Novo usuário $novoUsuario cadastrado com sucesso");
-
                         echo "Usuário cadastrado com sucesso!\n";
                     } else if ($escolha == 4) {
                         limparTela();
+
                         $novoProdutoId = count($produtos) + 1;
                         echo "---CADASTRO DE PRODUTO---\nId: $novoProdutoId\n";
 
@@ -366,7 +359,7 @@ while (true) {
                         while (true) {
                             if (strlen(trim($nomeNovoProduto)) < 1) {
                                 limparTela();
-                                echo "---CADASTRO DE PRODUTO---\nNome deve conter pelo menos 1 caracter válido!\n--------------------------\nId: $nomeNovoProduto\n";
+                                echo "---CADASTRO DE PRODUTO---\nNome deve conter pelo menos 1 caracter válido!\n--------------------------\nId: $novoProdutoId\n";
 
                                 $nomeNovoProduto = readline("Nome: ");
                             } else {
@@ -376,6 +369,7 @@ while (true) {
                                 break;
                             }
                         }
+
                         $precoNovoProduto = (double) readline("Preço: ");
                         while (true) {
                             if ($precoNovoProduto <= 0 || !is_double($precoNovoProduto)) {
@@ -390,7 +384,7 @@ while (true) {
                                 break;
                             }
                         }
-
+                        
                         $estoqueNovoProduto = (int) readline("Estoque: ");
                         while (true) {
                             if ($estoqueNovoProduto <= 0 || !is_int($estoqueNovoProduto)) {
@@ -495,8 +489,6 @@ while (true) {
                             }
                         }
 
-
-
                     } else if ($escolha == 6) {
                         exibirProdutos();
                         registrarLog("O $usuario visualizou os produtos cadastrados");
@@ -511,12 +503,11 @@ while (true) {
                         limparTela();
                     }
 
-
                 } else {
                     limparTela();
                     $valorCaixa = (double) readline("Quanto de dinheiro há no caixa? R$");
                     while (true) {
-                        if ($valorCaixa <= 0 || !is_double($valorCaixa)) {
+                        if ($valorCaixa < 0 || !is_double($valorCaixa)) {
                             limparTela();
                             echo "Valor inserido incorreto!\n";
                             $valorCaixa = (double) readline("Digite um valor válido para o caixa: R$");
@@ -528,7 +519,6 @@ while (true) {
                     }
                     limparTela();
                 }
-
             }
         } else {
             limparTela();
@@ -540,10 +530,6 @@ while (true) {
         limparLogs();
         break;
     }
-
-
 }
-
-
 
 ?>
