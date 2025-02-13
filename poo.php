@@ -387,7 +387,7 @@ while (true) {
                         
                         $estoqueNovoProduto = (int) readline("Estoque: ");
                         while (true) {
-                            if ($estoqueNovoProduto <= 0 || !is_int($estoqueNovoProduto)) {
+                            if ($estoqueNovoProduto < 0 || !is_int($estoqueNovoProduto)) {
                                 limparTela();
                                 echo "---CADASTRO DE PRODUTO---\nValor inserido inválido para o campo estoque!\n--------------------------\nId: $novoProdutoId\nNome: $nomeNovoProduto\nPreço: R$$precoNovoProduto\n";
 
@@ -417,6 +417,17 @@ while (true) {
                                 if ($escolha == 1) {
                                     limparTela();
                                     $mudancaNome = readline("Novo nome: ");
+                                    while (true) {
+                                        if (strlen(trim($mudancaNome)) < 1) {
+                                            limparTela();
+                                            echo "Nome deve conter pelo menos 1 caracter válido!\n";
+            
+                                            $mudancaNome = readline("Novo nome: ");
+                                        } else{
+                                            limparTela();
+                                            break;
+                                        }
+                                    }
                                     $produtoEditar->setNome($mudancaNome);
                                 } else if ($escolha == 2) {
                                     limparTela();
