@@ -25,17 +25,19 @@ class User
     public function relatorioVenda()
     {
         echo "--------------------------\nUsuário Atual: $this->usuario\nTotal de vendas realizadas: R$" . number_format($this->vendas, 2) . "\n--------------------------\n";
-        readline("Pressione qualquer tecla para voltar...");
+        readline("Pressione ENTER para voltar...");
 
 
         registrarLog("O $this->usuario visualizou seu próprio perfil");
     }
 
-    public function getSenha(){
+    public function getSenha()
+    {
         return $this->senha;
     }
 
-    public function getUsuario(){
+    public function getUsuario()
+    {
         return $this->usuario;
     }
 
@@ -60,10 +62,10 @@ class Produto
 
     public function removerEstoque($quantidade)
     {
-        if($quantidade <= $this->estoque){
-            
+        if ($quantidade <= $this->estoque) {
+
             $this->estoque -= $quantidade;
-        } else{
+        } else {
             echo "Valor ultrapassa quantidade no estoque";
         }
     }
@@ -198,7 +200,7 @@ function exibirProdutos()
         echo "Id: " . $produto->id . "\nNome: " . $produto->nome . "\nPreço: R$" . number_format($produto->preco, 2) . "\nEstoque: " . $produto->estoque . "\n---------------------------\n";
     }
 
-    readline("Pressione qualquer tecla para voltar...");
+    readline("Pressione ENTER para voltar...");
     limparTela();
 
 }
@@ -233,7 +235,7 @@ function limparTela()
 $usuarios = [];
 $produtos = [];
 
-$produtos[] = new Produto(1, "Café", 27.99, 20);
+$produtos[] = new Produto(1, "Cafe", 27.99, 20);
 $usuarios[] = new User(1, 'admin', 12345);
 $usuarioAtual = null;
 
@@ -246,6 +248,7 @@ while (true) {
 
     if ($escolha == 1) {
         limparTela();
+        echo "---------LOGIN---------\n";
         $usuario = readline("Usuário: ");
         $senha = readline("Senha: ");
         $usuario = trim($usuario);
@@ -259,10 +262,11 @@ while (true) {
                     $escolha = readline("-");
                     if ($escolha == 1) {
                         limparTela();
+                        echo "------VENDA DE PRODUTOS------\n";
                         $idProduto = readline("Qual id do produto para a venda: ");
                         if (existeProduto($idProduto)) {
                             $produto = existeProduto($idProduto);
-                            $quantidade = (int) readline("Quantas unidades do produto? ");
+                            $quantidade = (int) readline("Quantas unidades de " . $produto->getNome() . "? ");
 
                             while (true) {
                                 if ($quantidade <= 0 || !is_int($quantidade)) {
@@ -276,6 +280,7 @@ while (true) {
                             }
                             if ($produto->verificarEstoque($quantidade)) {
                                 limparTela();
+
                                 $valorVenda = $produto->getPreco() * $quantidade;
                                 echo "--------------------------\nO valor da venda ficou R$" . number_format($valorVenda, 2) . "\n";
                                 $recebido = readline("Valor recebido pelo cliente: R$");
@@ -292,7 +297,7 @@ while (true) {
                                         $usuarioAtual->adicionaVenda($valorVenda);
                                         $produto->removerEstoque($quantidade);
                                         $caixa->realizarVenda($recebido - $troco);
-                                        registrarLog("Usuário '$usuarioAtual->usuario' realizou venda de $quantidade unidades do produto ". $produto->getNome() . " no valor de R$$valorVenda");
+                                        registrarLog("Usuário '$usuarioAtual->usuario' realizou venda de $quantidade unidades do produto " . $produto->getNome() . " no valor de R$$valorVenda");
                                         limparTela();
                                         echo "Venda realizada com sucesso!" . $troco > 0 ? "Troco: R$" . number_format($troco, 2) . "\n" : "";
                                         echo "Venda: +R$$valorVenda\n";
@@ -384,7 +389,7 @@ while (true) {
                                 break;
                             }
                         }
-                        
+
                         $estoqueNovoProduto = (int) readline("Estoque: ");
                         while (true) {
                             if ($estoqueNovoProduto < 0 || !is_int($estoqueNovoProduto)) {
@@ -412,80 +417,95 @@ while (true) {
                         while (true) {
                             if (existeProduto($idEditar)) {
                                 $produtoEditar = existeProduto($idEditar);
-                                echo "O que deseja editar?\n[1]Nome\n[2]Preço\n[3]Estoque\n";
-                                $escolha = readline("- ");
-                                if ($escolha == 1) {
+                                while (true) {
                                     limparTela();
-                                    $mudancaNome = readline("Novo nome: ");
-                                    while (true) {
-                                        if (strlen(trim($mudancaNome)) < 1) {
-                                            limparTela();
-                                            echo "Nome deve conter pelo menos 1 caracter válido!\n";
-            
-                                            $mudancaNome = readline("Novo nome: ");
-                                        } else{
-                                            limparTela();
+                                    echo "----EDITAR " . strtoupper($produtoEditar->getNome())  . "----\n";
+                                    echo "O que deseja editar?\n[1]Nome\n[2]Preço\n[3]Estoque\n";
+                                    $escolha = readline("- ");
+                                    if ($escolha == 1) {
+                                        limparTela();
+                                        echo "----EDITAR " . strtoupper($produtoEditar->getNome())  . "----\n";
+                                        $mudancaNome = readline("Novo nome: ");
+                                        while (true) {
+                                            if (strlen(trim($mudancaNome)) < 1) {
+                                                limparTela();
+                                                echo "Nome deve conter pelo menos 1 caracter válido!\n";
+
+                                                $mudancaNome = readline("Novo nome: ");
+                                            } else {
+                                                limparTela();
+                                                break;
+                                            }
+                                        }
+                                        $produtoEditar->setNome($mudancaNome);
+                                        break;
+                                    } else if ($escolha == 2) {
+                                        limparTela();
+                                        echo "----EDITAR" . strtoupper($produtoEditar->getNome())  . "----\n";
+
+                                        $mudancaPreco = (double) readline("Novo preço: ");
+                                        while (true) {
+                                            if ($mudancaPreco <= 0 || !is_double($mudancaPreco)) {
+                                                limparTela();
+                                                echo "Valor inserido incorreto!\n";
+                                                $mudancaPreco = (double) readline("Novo preço: ");
+
+                                            } else {
+                                                $produtoEditar->setPreco($mudancaPreco);
+                                                break;
+                                            }
+                                        }
+                                        break;
+                                    } else if ($escolha == 3) {
+                                        limparTela();
+                                        echo "----ESTOQUE DE " . strtoupper(string: $produtoEditar->getNome())  . "----\n";
+
+                                        echo "[1] Adicionar ao estoque\n[2] Remover do estoque\n";
+                                        $mudanca = (int) readline("-");
+                                        while (true) {
+                                            if ($mudanca <= 0 || !is_int($mudanca) || $mudanca > 2) {
+                                                limparTela();
+                                                echo "Valor inserido incorreto!\n";
+                                                echo "----ESTOQUE DE " . strtoupper(string: $produtoEditar->getNome())  . "----\n";
+                                                echo "[1] Adicionar ao estoque\n[2] Remover do estoque\n";
+                                                $mudanca = (int) readline("-");
+
+                                            } else {
+
+                                                break;
+                                            }
+                                        }
+                                        echo "\n";
+                                        $quantidadeMudanca = (int) readline("Unidades: ");
+                                        while (true) {
+
+                                            if ($quantidadeMudanca <= 0 || !is_int($quantidadeMudanca)) {
+                                                limparTela();
+                                                echo "Valor inserido incorreto!\n";
+                                                $quantidadeMudanca = (int) readline("Unidades: ");
+
+                                            } else if ($mudanca == 2 && $quantidadeMudanca > $produtoEditar->getEstoque()) {
+                                                limparTela();
+                                                echo "Valor inserido incorreto! Excedeu a quantidade do estoque\n";
+                                                $quantidadeMudanca = (int) readline("Quantidade: ");
+
+                                            } else {
+
+                                                break;
+                                            }
+                                        }
+
+                                        if ($mudanca == 1) {
+                                            $produtoEditar->adicionarEstoque($quantidadeMudanca);
+                                            break;
+                                        } else {
+                                            $produtoEditar->removerEstoque($quantidadeMudanca);
                                             break;
                                         }
-                                    }
-                                    $produtoEditar->setNome($mudancaNome);
-                                } else if ($escolha == 2) {
+                                    } 
                                     limparTela();
-                                    $mudancaPreco = (double) readline("Novo preço: ");
-                                    while (true) {
-                                        if ($mudancaPreco <= 0 || !is_double($mudancaPreco)) {
-                                            limparTela();
-                                            echo "Valor inserido incorreto!\n";
-                                            $mudancaPreco = (double) readline("Novo preço: ");
-
-                                        } else {
-                                            $produtoEditar->setPreco($mudancaPreco);
-                                            break;
-                                        }
-                                    }
-                                } else if ($escolha == 3) {
-                                    limparTela();
-                                    echo "[1] Adicionar ao estoque\n[2] Remover do estoque\n";
-                                    $mudanca = (int) readline("-");
-                                    while (true) {
-                                        if ($mudanca <= 0 || !is_int($mudanca) || $mudanca > 2) {
-                                            limparTela();
-                                            echo "Valor inserido incorreto!\n";
-                                            echo "[1] Adicionar ao estoque\n[2] Remover do estoque\n";
-                                            $mudanca = (int) readline("-");
-
-                                        } else {
-
-                                            break;
-                                        }
-                                    }
-                                    $quantidadeMudanca = (int) readline("Quantidade: ");
-                                    while (true) {
-
-                                        if ($quantidadeMudanca <= 0 || !is_int($quantidadeMudanca)) {
-                                            limparTela();
-                                            echo "Valor inserido incorreto!\n";
-                                            $quantidadeMudanca = (int) readline("Quantidade: ");
-
-                                        }else if($mudanca == 2 && $quantidadeMudanca > $produtoEditar->getEstoque()){
-                                            limparTela();
-                                            echo "Valor inserido incorreto! Excedeu a quantidade do estoque\n";
-                                            $quantidadeMudanca = (int) readline("Quantidade: ");
-
-                                        } else {
-
-                                            break;
-                                        }
-                                    }
-
-                                    if ($mudanca == 1) {
-                                        $produtoEditar->adicionarEstoque($quantidadeMudanca);
-                                    } else {
-                                        $produtoEditar->removerEstoque($quantidadeMudanca);
-                                    }
-                                } else {
-                                    return;
                                 }
+
 
                                 limparTela();
                                 registrarLog("Produto $produtoEditar->nome foi editado com sucesso");
@@ -504,6 +524,7 @@ while (true) {
                         exibirProdutos();
                         registrarLog("O $usuario visualizou os produtos cadastrados");
                     } else if ($escolha == 7) {
+                        limparTela();
                         $usuarioAtual->relatorioVenda();
                         limparTela();
                     } else if ($escolha == 8) {
@@ -516,11 +537,14 @@ while (true) {
 
                 } else {
                     limparTela();
+                    echo "-----------------------------\n";
                     $valorCaixa = (double) readline("Quanto de dinheiro há no caixa? R$");
                     while (true) {
                         if ($valorCaixa < 0 || !is_double($valorCaixa)) {
                             limparTela();
                             echo "Valor inserido incorreto!\n";
+
+                            echo "-----------------------------\n";
                             $valorCaixa = (double) readline("Digite um valor válido para o caixa: R$");
 
                         } else {
